@@ -7,6 +7,7 @@ import sys
 import subprocess as sp
 import datetime
 import os
+import encrypt
 
 
 def get_tasks():
@@ -20,7 +21,9 @@ def update_tasks(tasks):
 		csv.writer(tasks_file).writerows(tasks)
 
 
-def get_sum():
+def get_sum(tasks):
+	if os.path.getmtime(settings.sum_path) < os.path.getmtime(settings.tasks_path):
+		update_sum(sum(map(lambda x: int(x[1]), tasks)))
 	with open(settings.sum_path) as infile:
 		return int(infile.read().strip())
 
@@ -64,7 +67,7 @@ def add_task():
 	tasks = get_tasks()
 	tasks.append([name, str(units)])
 	update_tasks(tasks)
-	update_sum(get_sum() + units)
+	update_sum(get_sum(tasks) + units)
 
 
 def list_tasks():
@@ -79,31 +82,32 @@ def list_tasks():
 		print(settings.task_string.format(task[0]))
 
 
-
 def pick_task():
 	tasks = get_tasks()
-	tasks_sum = get_sum()
+	tasks_sum = get_sum(tasks)
 	task = random.randint(1, tasks_sum)
 
 	picked_task = -1
 	while task > 0:
 		picked_task += 1
 		task -= int(tasks[picked_task][1])
-	
+	task = decrement_task(tasks, picked_task)
 	update_sum(tasks_sum - 1)
-	return decrement_task(tasks, picked_task)
+	return task
 
 
 def check_time():
 	with open(settings.time_file) as infile:
-		time = datetime.datetime.strptime(infile.read().strip(), settings.time_format)
+		time = encrypt.decrypt(infile.read())
+	time = datetime.datetime.strptime(time, settings.time_format)
 	diff = (datetime.datetime.now() - time).seconds // 60
 	return diff >= int(settings.time_designated)
 
 
 def set_time():
 	with open(settings.time_file, 'w') as outfile:
-		outfile.write(datetime.datetime.now().strftime(settings.time_format))
+		time = datetime.datetime.now().strftime(settings.time_format)
+		outfile.write(encrypt.encrypt(time))
 
 
 def main():

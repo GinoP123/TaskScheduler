@@ -7,8 +7,8 @@ time_file = "text_files/time.txt"
 
 # Presets
 time_format = "%m/%d/%Y, %H:%M:%S"
-time_designated = "25"
-time_until_break = "20"
+time_designated = "30"
+time_until_break = "25"
 
 input_name = "\n\tEnter Name: "
 input_units = "\n\tUnits: "
@@ -22,3 +22,9 @@ invalid_syntax_message = "ERROR: INVALID SYNTAX"
 
 task_column_labels = "\n\tTASKS REMAINING:\n"
 task_string = "\t\t{}\n"
+
+
+# Encryption Presets
+binary_format = '#010b'
+bits_in_byte = 8
+
